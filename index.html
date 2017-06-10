@@ -1,0 +1,107 @@
+<canvas id="gc" width="400" height="400"></canvas>
+<script>
+window.onload=function() {
+    canv=document.getElementById("gc");
+    ctx=canv.getContext("2d");
+    document.addEventListener("keydown",keyPush);
+    setInterval(game,3000/15);
+}
+
+let grid_size = 20;
+let tile_count = 20;
+
+let starting_position = Math.floor(grid_size / 2);
+let starting_length = 5;
+let pos_x = starting_position;
+let pos_y = starting_position;
+
+let apple_x = 15; // first apple will be here
+let apple_y = 15; // first apple will be here
+
+// start from stand still
+let x_velocity = 0;
+let y_velocity = 0;
+
+
+let trail = []; // will be an array of {x: x, y: y} objects
+let tail_length = starting_length;
+
+function reset() {
+    pos_x = starting_position;
+    pos_y = starting_position;
+    trail = [];
+    tail_length = starting_length;
+}
+
+function spawn_apple(){
+    apple_x = Math.floor(Math.random() * grid_size);
+    apple_y = Math.floor(Math.random() * grid_size);
+    ctx.fillStyle = "red";
+    ctx.fillRect(apple_x * grid_size, apple_y * grid_size, grid_size, grid_size);
+}
+
+function game() {
+    pos_x += x_velocity;
+    pos_y += y_velocity;
+
+    ctx.fillStyle="black";
+    ctx.fillRect(0, 0, canv.width, canv.height);
+
+    // draw our lil snek
+    ctx.fillStyle = "lime";
+    ctx.fillRect(pos_x * grid_size, pos_y * grid_size, grid_size - 2, grid_size - 2)
+
+    if (pos_x == -1 || pos_x == tile_count || pos_y == -1 || pos_y == tile_count) {
+        // we hit a wall
+        reset();
+    }
+    
+    for (var i = 0; i < trail.length; i++) {
+        var pos = trail[i];
+        if (pos.x == pos_x && pos.y == pos_y) {
+            // ate ourself
+            reset();
+            break;
+        }
+    }
+
+    trail.unshift({x: pos_x, y: pos_y});
+    trail.splice(tail_length)
+    for (var i = 0; i < trail.length; i++) {
+       ctx.fillRect(trail[i].x * grid_size, trail[i].y * grid_size, grid_size - 2, grid_size - 2) ;
+    }
+    if (pos_x == apple_x && pos_y == apple_y) {
+        spawn_apple()
+        tail_length++;
+    }
+    else {
+        // re-draw our apple
+        ctx.fillStyle = "red";
+        ctx.fillRect(apple_x * grid_size, apple_y * grid_size, grid_size, grid_size);
+    }
+    
+}
+
+
+
+function keyPush(evt) {
+    switch(evt.keyCode) {
+        case 37:
+            // left
+            x_velocity=-1;y_velocity=0;
+            break;
+        case 38:
+            // up
+            x_velocity=0;y_velocity=-1;
+            break;
+        case 39:
+            // right
+            x_velocity=1;y_velocity=0;
+            break;
+        case 40:
+            // down
+            x_velocity=0;y_velocity=1;
+            break;
+    }
+}
+</script>
