@@ -43,6 +43,9 @@ function random_space() {
 function spawn_apple(){
     apple_x = random_space();
     apple_y = random_space();
+}
+
+function draw_apple() {
     ctx.fillStyle = "red";
     ctx.fillRect(apple_x * grid_size, apple_y * grid_size, grid_size, grid_size);
 }
@@ -57,6 +60,7 @@ function spawn_wormhole() {
     x2 = random_space(),
     y2 = random_space(),
     color = colors[color_index++ % colors.length];
+    color_index = color_index % colors.length;
     while (x1 === x2) {
         x1 = random_space();
     }
@@ -119,21 +123,13 @@ function game() {
             ctx.fillRect(trail[i].x * grid_size, trail[i].y * grid_size, grid_size - 2, grid_size - 2) ;
         }
     if (pos_x == apple_x && pos_y == apple_y) {
-        spawn_apple()
-            tail_length++;
+        // eat apple
+        spawn_apple();
+        tail_length++;
         spawn_wormhole();
-        /*
-           if (tail_length % 6 === 0) {
-           spawn_wormhole();
-           }
-         */
-    }
-    else {
-        // re-draw our apple
-        ctx.fillStyle = "red";
-        ctx.fillRect(apple_x * grid_size, apple_y * grid_size, grid_size, grid_size);
     }
     draw_wormholes();
+    draw_apple();
 
 }
 
